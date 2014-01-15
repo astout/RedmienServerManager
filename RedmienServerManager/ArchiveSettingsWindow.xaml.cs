@@ -50,7 +50,7 @@ namespace RedmineServerManager
             //Initialize the VM Name field
             if(set.VMName == "")
             {
-                txt_VMName.Text = "Redmine";
+                txt_VMName.Text = "redmine";
                 txt_VMName.Foreground = Brushes.Gray;
             }
             else

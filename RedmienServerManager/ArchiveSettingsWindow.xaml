@@ -22,7 +22,7 @@
             <System:String>Weekly</System:String>
             <System:String>Daily</System:String>
         </ComboBox>
-        <TextBox x:Name="txt_VMName" HorizontalAlignment="Left" Height="26" Margin="172,22,0,0" TextWrapping="Wrap" Text="Redmine" VerticalAlignment="Top" Width="278" FontSize="16"/>
+        <TextBox x:Name="txt_VMName" HorizontalAlignment="Left" Height="26" Margin="172,22,0,0" TextWrapping="Wrap" Text="redmine" VerticalAlignment="Top" Width="278" FontSize="16"/>
         <Label Content="VM Name" HorizontalAlignment="Left" Margin="84,17,0,0" VerticalAlignment="Top" Foreground="White" FontSize="16" Height="31" Width="81"/>
         <TextBox x:Name="txt_archiveMDays" HorizontalAlignment="Left" Height="22" Margin="328,153,0,0" TextWrapping="Wrap" Text="1,11,21" VerticalAlignment="Top" Width="409" FontSize="16" Visibility="Hidden"/>
         <Grid x:Name="view_ArchWDays" HorizontalAlignment="Left" Height="26" Margin="305,147,0,0" VerticalAlignment="Top" Width="418" Visibility="Hidden">
