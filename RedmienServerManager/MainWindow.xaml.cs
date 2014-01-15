@@ -36,7 +36,7 @@ namespace RedmineServerManager
         private void CheckSettings()
         {
             var set = Properties.Settings.Default;
-            if(set.VMlocation == "" || set.VMName == "" || set.SaveLocation == "" || set.ArchiveFreq == "")
+            if(set.VMlocation == "" || set.VMName == "" || set.SaveLocation == "")
             {
                 ArchiveSettingsWindow win_archive = new ArchiveSettingsWindow();
                 win_archive.Show();

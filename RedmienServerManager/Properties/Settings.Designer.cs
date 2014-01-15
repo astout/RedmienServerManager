@@ -61,9 +61,10 @@ namespace RedmineServerManager.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        public global::System.DateTime ArchiveTime {
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string ArchiveTime {
             get {
-                return ((global::System.DateTime)(this["ArchiveTime"]));
+                return ((string)(this["ArchiveTime"]));
             }
             set {
                 this["ArchiveTime"] = value;
@@ -72,13 +73,37 @@ namespace RedmineServerManager.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string ArchiveFreq {
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int ArchiveFreq {
             get {
-                return ((string)(this["ArchiveFreq"]));
+                return ((int)(this["ArchiveFreq"]));
             }
             set {
                 this["ArchiveFreq"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string ArchiveMDays {
+            get {
+                return ((string)(this["ArchiveMDays"]));
+            }
+            set {
+                this["ArchiveMDays"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0,1,1,0,0,0,1")]
+        public string ArchiveWDays {
+            get {
+                return ((string)(this["ArchiveWDays"]));
+            }
+            set {
+                this["ArchiveWDays"] = value;
             }
         }
     }

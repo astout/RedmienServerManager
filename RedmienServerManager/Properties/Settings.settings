@@ -11,11 +11,17 @@
     <Setting Name="VMName" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
-    <Setting Name="ArchiveTime" Type="System.DateTime" Scope="User">
+    <Setting Name="ArchiveTime" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
-    <Setting Name="ArchiveFreq" Type="System.String" Scope="User">
+    <Setting Name="ArchiveFreq" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">0</Value>
+    </Setting>
+    <Setting Name="ArchiveMDays" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="ArchiveWDays" Type="System.String" Scope="User">
+      <Value Profile="(Default)">0,1,1,0,0,0,1</Value>
     </Setting>
   </Settings>
 </SettingsFile>
