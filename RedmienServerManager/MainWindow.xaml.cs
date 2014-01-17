@@ -26,11 +26,8 @@ namespace RedmineServerManager
         public MainWindow()
         {
             InitializeComponent();
+            InitializeVMStatusIndicators();
             CheckSettings();
-            if(!isVMRunning())
-            {
-                InitializeVMStatusIndicators();
-            }
         }
 
         private void CheckSettings()
@@ -46,21 +43,38 @@ namespace RedmineServerManager
 
         private bool isVMRunning()
         {
+            //set up child process
             Process process = new Process();
             process.StartInfo.UseShellExecute = false;
             process.StartInfo.RedirectStandardOutput = true;
             process.StartInfo.CreateNoWindow = true;
+
+            //Run hidden command prompt
             process.StartInfo.FileName = "cmd.exe";
-            process.StartInfo.Arguments = "/C vboxmanage list runningvms | find \"redmine\" | find /c /v \"~~~\"";
+
+            //Using vboxmanage, check if there is a virtual machine by the name in settings running
+            //this command will return the number of machines running by the given name
+            process.StartInfo.Arguments = "/C vboxmanage list runningvms | find \"" + Properties.Settings.Default.VMName + "\" | find /c /v \"~~~\"";
             process.Start();
+
             int num = -1;
             string output = "";
+
+            //if the process has output, get the first line
             if (process.StandardOutput != null)
             {
                 output = process.StandardOutput.ReadLine();
             }
+
+            //Regex for a digit (number)
             Regex r = new Regex(@"\d");
+
+            //debug
             logLine(output);
+
+            //Check if the output contains a number
+            //if so, store the number and convert it to an int
+            //otherwise, log an error that the output couldn't be parsed.
             Match m = r.Match(output);
             if (m.Success)
             {
@@ -70,21 +84,30 @@ namespace RedmineServerManager
                 }
                 catch (FormatException e)
                 {
-                    logLine("The number of virtual machine's by the name 'redmine', couldn't be parsed.");
+                    logLine("The number of virtual machine's by the name '" + Properties.Settings.Default.VMName + "', couldn't be parsed.");
                     num = -1;
                 }
             }
+
+            //log the rest of the output
             logLine(process.StandardOutput.ReadToEnd());
+
+            //wait for the command to finish
             process.WaitForExit();
 
-            if (num > -1)
-            {
-                if (num == 0)
-                    return false;
-                else
-                    return true;
-            }
+            //if at least one vm running, return true
+            if (num > 0)
+                return true;
             return false;
+
+            //if (num > -1)
+            //{
+            //    if (num == 0)
+            //        return false;
+            //    else
+            //        return true;
+            //}
+            //return false;
         }
 
         /// <summary>
@@ -95,15 +118,35 @@ namespace RedmineServerManager
             //Create a Solid Color Brush for setting custom colors by the hex value selected from the Designer tool.
             SolidColorBrush b = new SolidColorBrush();
 
-            //Set Each indicator to White, except the 'off' indicator.
-            ind_running.Fill = Brushes.White;
-            ind_booting.Fill = Brushes.White;
-            ind_archiving.Fill = Brushes.White;
-            ind_shuttingDown.Fill = Brushes.White;
+            //if VM is running, set 'on' indicator to green and rest to white
+            //otherwise set the 'off' indicator to red and the rest to white
+            if(isVMRunning())
+            {
+                //Set Each indicator to White, except the 'off' indicator.
+                ind_off.Fill = Brushes.White;
+                ind_booting.Fill = Brushes.White;
+                ind_archiving.Fill = Brushes.White;
+                ind_shuttingDown.Fill = Brushes.White;
 
-            //Set a brush color to the red hex value and apply the brush to the 'off' indicator
-            b.Color = (Color)ColorConverter.ConvertFromString("#FFE04141");
-            ind_off.Fill = b;
+                //Set a brush color to green hex and apply the brush to the 'on' indicator
+                b.Color = (Color)ColorConverter.ConvertFromString("#FF74AE53");
+                ind_running.Fill = b;
+
+            }
+            else
+            {
+                //Set Each indicator to White, except the 'off' indicator.
+                ind_running.Fill = Brushes.White;
+                ind_booting.Fill = Brushes.White;
+                ind_archiving.Fill = Brushes.White;
+                ind_shuttingDown.Fill = Brushes.White;
+
+                //Set a brush color to the red hex value and apply the brush to the 'off' indicator
+                b.Color = (Color)ColorConverter.ConvertFromString("#FFE04141");
+                ind_off.Fill = b;
+            }
+
+
         }
 
         private void btn_stopServer_click(object sender, System.Windows.RoutedEventArgs e)

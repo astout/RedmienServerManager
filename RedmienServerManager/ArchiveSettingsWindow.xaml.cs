@@ -11,6 +11,8 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using System.Windows.Forms;
+using System.Configuration;
 using System.Text.RegularExpressions;
 
 namespace RedmineServerManager
@@ -62,13 +64,13 @@ namespace RedmineServerManager
             //Initialize the Archive Location Field
             if(set.SaveLocation == "")
             {
-                txt_saveLocation.Text = "Where to save the archives";
-                txt_saveLocation.Foreground = Brushes.Gray;
+                txt_archLocation.Text = "Where to save the archives";
+                txt_archLocation.Foreground = Brushes.Gray;
             }
             else
             {
-                txt_saveLocation.Text = set.SaveLocation;
-                txt_saveLocation.Foreground = Brushes.Black;
+                txt_archLocation.Text = set.SaveLocation;
+                txt_archLocation.Foreground = Brushes.Black;
             }
 
             //Initialize Archive frequency combo box
@@ -140,7 +142,7 @@ namespace RedmineServerManager
                     chk_Thu.IsChecked = days[4] == "1" ? true : false;
                     chk_Fri.IsChecked = days[5] == "1" ? true : false;
                     chk_Sat.IsChecked = days[6] == "1" ? true : false;
-                    MessageBox.Show(days[6]);
+                    System.Windows.MessageBox.Show(days[6]);
                 }
 
                 txt_archiveMDays.Visibility = System.Windows.Visibility.Hidden;
@@ -192,5 +194,85 @@ namespace RedmineServerManager
             RebuildTimeString();
         }
 
+        private void btn_VmDirSelect_click(object sender, RoutedEventArgs e)
+        {
+            FolderBrowserDialog vmDirDialog = new FolderBrowserDialog();
+            vmDirDialog.ShowDialog();
+
+            if (vmDirDialog.SelectedPath.Length > 1)
+            {
+                txt_VMlocation.Text = vmDirDialog.SelectedPath;
+                txt_VMlocation.Foreground = Brushes.Black;
+            }
+        }
+
+        private void btn_archLocation_click(object sender, RoutedEventArgs e)
+        {
+            FolderBrowserDialog archDirDialog = new FolderBrowserDialog();
+            archDirDialog.ShowDialog();
+
+            if(archDirDialog.SelectedPath.Length > 1)
+            {
+                txt_archLocation.Text = archDirDialog.SelectedPath;
+                txt_VMlocation.Foreground = Brushes.Black;
+            }
+        }
+
+        private void btn_saveSettings_click(object sender, RoutedEventArgs e)
+        {
+            //Save all text fields, trim off any excess whitespace
+            Properties.Settings.Default.VMName = txt_VMName.Text.Trim();
+            Properties.Settings.Default.VMlocation = txt_VMlocation.Text.Trim();
+            Properties.Settings.Default.SaveLocation = txt_archLocation.Text.Trim();
+
+            //Save the time settings
+
+            //Archive Frequency, Monthly: 0, Weekly: 1, Daily: 2
+            Properties.Settings.Default.ArchiveFreq = combo_ArchiveFreq.SelectedIndex; //An integer 0-2
+            int h = combo_ArchiveTime_H.SelectedIndex == 0 ? 12 : combo_ArchiveTime_H.SelectedIndex;
+            int m = combo_ArchiveTime_M.SelectedIndex * 5;
+            string ap = combo_ArchiveTime_AP.SelectedIndex == 0 ? "AM" : "PM";
+            string time = h.ToString("00") + ":" + m.ToString("00") + " " + ap;
+            Properties.Settings.Default.ArchiveTime = time;
+
+            switch(combo_ArchiveFreq.SelectedIndex)
+            {
+                case 0:
+                    Properties.Settings.Default.ArchiveMDays = txt_archiveMDays.Text.Replace(@"\s", "");
+                    break;
+                case 1:
+                    Properties.Settings.Default.ArchiveWDays = GetWDaysString();
+                    break;
+                default:
+                    break;
+            }
+
+            string text = "";
+            foreach (SettingsProperty setting in Properties.Settings.Default.Properties)
+            {
+                text += "Setting: " + setting.Name + ": " + Properties.Settings.Default[setting.Name] + "\n";
+            }
+
+            System.Windows.MessageBox.Show(text);
+
+            Properties.Settings.Default.Save();
+
+            this.Close();
+        }
+
+        private string GetWDaysString()
+        {
+            string days = "";
+
+            days += chk_Sun.IsChecked == true ? 1 : 0;
+            days += chk_Mon.IsChecked == true ? 1 : 0;
+            days += chk_Tue.IsChecked == true ? 1 : 0;
+            days += chk_Wed.IsChecked == true ? 1 : 0;
+            days += chk_Thu.IsChecked == true ? 1 : 0;
+            days += chk_Fri.IsChecked == true ? 1 : 0;
+            days += chk_Sat.IsChecked == true ? 1 : 0;
+
+            return days;
+        }
     }
 }

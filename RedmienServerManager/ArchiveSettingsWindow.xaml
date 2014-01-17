@@ -12,10 +12,10 @@
         </Grid.ColumnDefinitions>
         <TextBox x:Name="txt_VMlocation" HorizontalAlignment="Left" Height="26" Margin="172,61,0,0" TextWrapping="Wrap" Text="Where the Virtual Machine exists" VerticalAlignment="Top" Width="551" FontSize="16"/>
         <Label Content="VM Directory" HorizontalAlignment="Left" Margin="64,56,0,0" VerticalAlignment="Top" Foreground="White" FontSize="16" Height="31" Width="103"/>
-        <Button Content="Select" HorizontalAlignment="Left" Margin="705,61,0,0" VerticalAlignment="Top" Width="75" FontSize="16" Height="26"/>
-        <TextBox x:Name="txt_saveLocation" HorizontalAlignment="Left" Height="26" Margin="172,105,0,0" TextWrapping="Wrap" Text="Where to save the archives" VerticalAlignment="Top" Width="551" FontSize="16"/>
+        <Button x:Name="btn_VmDirSelect" Content="Select" HorizontalAlignment="Left" Margin="705,61,0,0" VerticalAlignment="Top" Width="75" FontSize="16" Height="26" Click="btn_VmDirSelect_click"/>
+        <TextBox x:Name="txt_archLocation" HorizontalAlignment="Left" Height="26" Margin="172,105,0,0" TextWrapping="Wrap" Text="Where to save the archives" VerticalAlignment="Top" Width="551" FontSize="16"/>
         <Label Content="Archive Directory" HorizontalAlignment="Left" Margin="36,100,0,0" VerticalAlignment="Top" Foreground="White" FontSize="16" Height="31" Width="131"/>
-        <Button Content="Select" HorizontalAlignment="Left" Margin="705,105,0,0" VerticalAlignment="Top" Width="75" FontSize="16" Height="26"/>
+        <Button x:Name="btn_archLocation" Content="Select" HorizontalAlignment="Left" Margin="705,105,0,0" VerticalAlignment="Top" Width="75" FontSize="16" Height="26" Click="btn_archLocation_click"/>
         <Label Content="Archive Frequency" HorizontalAlignment="Left" Margin="29,146,0,0" VerticalAlignment="Top" Foreground="White" FontSize="16" Height="31" Width="143"/>
         <ComboBox x:Name="combo_ArchiveFreq" HorizontalAlignment="Left" Margin="172,153,0,0" VerticalAlignment="Top" Width="120" SelectionChanged="combo_ArchiveFreq_changed" Height="22">
             <System:String>Monthly</System:String>
@@ -68,6 +68,7 @@
             <System:String>AM</System:String>
             <System:String>PM</System:String>
         </ComboBox>
+        <Button x:Name="btn_saveSettings" Content="Save Settings" HorizontalAlignment="Left" Margin="705,273,0,0" VerticalAlignment="Top" Width="118" Height="39" Background="#FF8ED46D" FontSize="18" Click="btn_saveSettings_click"/>
 
     </Grid>
 </Window>
