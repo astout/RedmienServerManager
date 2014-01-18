@@ -8,7 +8,7 @@
 		<Button x:Name="btn_stopServer" Content="Stop Server" HorizontalAlignment="Left" Margin="206,25,0,0" VerticalAlignment="Top" Width="107" Height="99.96" Background="#FFE04141" FontFamily="Segoe UI Light" FontSize="14.667" ToolTip="If server is stopped, starts the server" FontWeight="Light" Click="btn_stopServer_click"/>
 		<Button x:Name="btn_ArchiveSettings" Content="Archive Settings" HorizontalAlignment="Left" Margin="339,91,0,0" VerticalAlignment="Top" Width="107" Height="33.96" Background="#FF50C1DA" FontFamily="Segoe UI Light" FontSize="14.667" ToolTip="If server is stopped, starts the server" FontWeight="Light" Click="btn_ArchiveSettings_click"/>
 		<Button x:Name="btn_archiveNow" Content="Archive Now" HorizontalAlignment="Left" Margin="339,25,0,0" VerticalAlignment="Top" Width="107" Height="61" Background="#FF50C1DA" FontFamily="Segoe UI Light" FontSize="14.667" ToolTip="If server is stopped, starts the server" FontWeight="Light" Click="btn_archiveNow_click"/>
-		<Expander x:Name="exp_log" Header="Show Log" HorizontalAlignment="Left" Margin="428.1,210,0,0" VerticalAlignment="Top" Background="White" MouseDown="exp_log_mouseDown" Expanded="exp_Expanded" Collapsed="exp_Collapsed">
+		<Expander x:Name="exp_log" Header="Show Log" HorizontalAlignment="Left" Margin="428.1,210,0,0" VerticalAlignment="Top" Background="White" Expanded="exp_Expanded" Collapsed="exp_Collapsed">
 			<Grid Background="#FFE5E5E5">
 				<Grid.ColumnDefinitions>
 					<ColumnDefinition Width="0*"/>

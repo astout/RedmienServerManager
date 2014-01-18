@@ -15,6 +15,7 @@ using System.Windows.Shapes;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
 using System.Xml;
+using Microsoft.WindowsAPICodePack.Dialogs;
 
 namespace RedmineServerManager
 {
@@ -26,6 +27,7 @@ namespace RedmineServerManager
         public MainWindow()
         {
             InitializeComponent();
+            Properties.Settings.Default.Reset();
             InitializeVMStatusIndicators();
             CheckSettings();
         }
@@ -36,7 +38,17 @@ namespace RedmineServerManager
             if(set.VMlocation == "" || set.VMName == "" || set.SaveLocation == "")
             {
                 ArchiveSettingsWindow win_archive = new ArchiveSettingsWindow();
-                win_archive.Show();
+                win_archive.ShowDialog();
+                this.Visibility = System.Windows.Visibility.Hidden;
+                win_archive.Activate();
+
+                bool? result = win_archive.DialogResult;
+                if(result ?? true)
+                {
+                    System.Windows.MessageBox.Show("You saved stuff.\nresult: " + result, "Debug");
+                    this.Close();
+                }
+
             }
             
         }
@@ -152,17 +164,13 @@ namespace RedmineServerManager
         private void btn_stopServer_click(object sender, System.Windows.RoutedEventArgs e)
         {
             logLine("Stop button clicked");
+            logLine("VM Name = " + Properties.Settings.Default.VMName);
         }
 		
 		public bool isServerRunning()
 		{
 			Console.WriteLine();
             return true; //:STUMP
-		}
-
-		private void exp_log_mouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
-		{
-			// TODO: Add event handler implementation here.
 		}
 
         private void exp_Expanded(object sender, RoutedEventArgs e)
@@ -200,6 +208,8 @@ namespace RedmineServerManager
         private void btn_ArchiveSettings_click(object sender, RoutedEventArgs e)
         {
             logLine("Archive Settings button clicked");
+
+            
         }
     }
 }

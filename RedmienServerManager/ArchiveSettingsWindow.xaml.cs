@@ -14,6 +14,7 @@ using System.Windows.Shapes;
 using System.Windows.Forms;
 using System.Configuration;
 using System.Text.RegularExpressions;
+using Microsoft.WindowsAPICodePack.Dialogs;
 
 namespace RedmineServerManager
 {
@@ -22,13 +23,19 @@ namespace RedmineServerManager
     /// </summary>
     public partial class ArchiveSettingsWindow : Window
     {
+
+        private bool Saved;
+
         public ArchiveSettingsWindow()
         {
 
             InitializeComponent();
             CheckSettings();
 
-            DateTime t = DateTime.Now;
+            Saved = false;
+
+            //this.Focus();
+            //DateTime t = DateTime.Now;
             //MessageBox.Show(t.ToString()); //added comment
 
         }
@@ -123,7 +130,7 @@ namespace RedmineServerManager
                     txt_archiveMDays.Text = set.ArchiveMDays;
                     txt_archiveMDays.Foreground = Brushes.Black;
                 }
-                txt_archiveMDays.Visibility = System.Windows.Visibility.Visible;
+                view_Mdays.Visibility = System.Windows.Visibility.Visible;
             }
 
             //If 'Weekly' Selected
@@ -142,10 +149,9 @@ namespace RedmineServerManager
                     chk_Thu.IsChecked = days[4] == "1" ? true : false;
                     chk_Fri.IsChecked = days[5] == "1" ? true : false;
                     chk_Sat.IsChecked = days[6] == "1" ? true : false;
-                    System.Windows.MessageBox.Show(days[6]);
                 }
 
-                txt_archiveMDays.Visibility = System.Windows.Visibility.Hidden;
+                view_Mdays.Visibility = System.Windows.Visibility.Hidden;
                 view_ArchWDays.Visibility = System.Windows.Visibility.Visible;
 
             }
@@ -196,30 +202,144 @@ namespace RedmineServerManager
 
         private void btn_VmDirSelect_click(object sender, RoutedEventArgs e)
         {
-            FolderBrowserDialog vmDirDialog = new FolderBrowserDialog();
-            vmDirDialog.ShowDialog();
+            //FolderBrowserDialog vmDirDialog = new FolderBrowserDialog();
+            //vmDirDialog.ShowDialog();
 
-            if (vmDirDialog.SelectedPath.Length > 1)
+            //if (vmDirDialog.SelectedPath.Length > 1)
+            //{
+            //    txt_VMlocation.Text = vmDirDialog.SelectedPath;
+            //    txt_VMlocation.Foreground = Brushes.Black;
+            //}
+            var dialog = new CommonOpenFileDialog();
+            dialog.Title = "Select Virtual Machine Directory";
+            dialog.IsFolderPicker = true;
+            dialog.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + @"\VirtualBox VMs";
+
+            dialog.AddToMostRecentlyUsedList = false;
+            dialog.AllowNonFileSystemItems = false;
+            dialog.EnsureFileExists = true;
+            dialog.EnsurePathExists = true;
+            dialog.EnsureReadOnly = false;
+            dialog.EnsureValidNames = true;
+            dialog.Multiselect = false;
+            dialog.ShowPlacesList = true;
+
+            if(dialog.ShowDialog() == CommonFileDialogResult.Ok)
             {
-                txt_VMlocation.Text = vmDirDialog.SelectedPath;
+                txt_VMlocation.Text = dialog.FileName;
                 txt_VMlocation.Foreground = Brushes.Black;
             }
+
         }
 
         private void btn_archLocation_click(object sender, RoutedEventArgs e)
         {
-            FolderBrowserDialog archDirDialog = new FolderBrowserDialog();
-            archDirDialog.ShowDialog();
+            //FolderBrowserDialog archDirDialog = new FolderBrowserDialog();
+            //archDirDialog.ShowDialog();
 
-            if(archDirDialog.SelectedPath.Length > 1)
+            //if(archDirDialog.SelectedPath.Length > 1)
+            //{
+            //    txt_archLocation.Text = archDirDialog.SelectedPath;
+            //    txt_archLocation.Foreground = Brushes.Black;
+            //}
+
+            var dialog = new CommonOpenFileDialog();
+            dialog.Title = "Select Virtual Machine Directory";
+            dialog.IsFolderPicker = true;
+            dialog.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyComputer);
+
+            dialog.AddToMostRecentlyUsedList = false;
+            dialog.AllowNonFileSystemItems = false;
+            dialog.EnsureFileExists = true;
+            dialog.EnsurePathExists = true;
+            dialog.EnsureReadOnly = false;
+            dialog.EnsureValidNames = true;
+            dialog.Multiselect = false;
+            dialog.ShowPlacesList = true;
+
+            if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
             {
-                txt_archLocation.Text = archDirDialog.SelectedPath;
-                txt_VMlocation.Foreground = Brushes.Black;
+                txt_archLocation.Text = dialog.FileName;
+                txt_archLocation.Foreground = Brushes.Black;
             }
         }
 
+        /// <summary>
+        /// Parses the data entered in the form and saves it to User Settings
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void btn_saveSettings_click(object sender, RoutedEventArgs e)
         {
+            //Validate
+            if (txt_VMName.Text.Length < 1)
+            {
+                System.Windows.MessageBox.Show("Please enter a valid name in the 'VM Name' field.", "Invalid Entry");
+                txt_VMName.Focus();
+                return;
+            }
+            if (txt_VMlocation.Text == "Where the Virtual Machine Exists" || txt_VMlocation.Text.Length < 1)
+            {
+                System.Windows.MessageBox.Show("Please enter a valid path in the 'VM Directory' field.", "Invalid Entry");
+                txt_VMlocation.Focus();
+                return;
+            }
+            if (txt_archLocation.Text == "Where to save the archives" || txt_archLocation.Text.Length < 1)
+            {
+                System.Windows.MessageBox.Show("Please enter a valid path in the 'Archive Directory' field.", "Invalid Entry");
+                txt_archLocation.Focus();
+                return;
+            }
+            if(combo_ArchiveFreq.SelectedIndex == 0)
+            {
+                var result = GetMDays(txt_archiveMDays.Text);
+                string txt = "";
+                switch (result.Item2)
+                {
+                    case 0:
+                        break;
+                    case 1:
+                        txt = "Please Enter a valid list of month days separated by commas.\n";
+                        txt += "(For example: 1,11,21).";
+                        System.Windows.MessageBox.Show(txt, "Invalid Entry");
+                        view_ArchWDays.Visibility = System.Windows.Visibility.Hidden;
+                        view_Mdays.Visibility = System.Windows.Visibility.Visible;
+                        txt_archiveMDays.Focus();
+                        return;
+                    case 2:
+                        txt = "The following numbers are out of range for a month:\n";
+                        txt += result.Item3 + "\n";
+                        txt += "The numbers should be comma separated and in the range 1-31.\n";
+                        txt += "(For example: 1,11,21).";
+                        System.Windows.MessageBox.Show(txt, "Days out of Range");
+                        view_ArchWDays.Visibility = System.Windows.Visibility.Hidden;
+                        view_Mdays.Visibility = System.Windows.Visibility.Visible;
+                        txt_archiveMDays.Focus();
+                        return;
+                }
+            }
+            if(combo_ArchiveFreq.SelectedIndex == 1)
+            {
+                int sum = 0;
+                sum += chk_Sun.IsChecked == true ? 1 : 0;
+                sum += chk_Mon.IsChecked == true ? 1 : 0;
+                sum += chk_Tue.IsChecked == true ? 1 : 0;
+                sum += chk_Wed.IsChecked == true ? 1 : 0;
+                sum += chk_Thu.IsChecked == true ? 1 : 0;
+                sum += chk_Fri.IsChecked == true ? 1 : 0;
+                sum += chk_Sat.IsChecked == true ? 1 : 0;
+                if(sum == 7 || sum == 0)
+                {
+                    string txt = "If you select every day or no days when you have chosen 'Weekly'\n";
+                    txt += "for 'Archive Frequency,' It will be treated as a 'daily' archive setting.";
+                    System.Windows.MessageBoxResult r = System.Windows.MessageBox.Show(txt, "Notice: Archives will be Daily!", MessageBoxButton.OKCancel);
+                    if(r == System.Windows.MessageBoxResult.Cancel)
+                    {
+                        return;
+                    }
+                }
+            }
+
             //Save all text fields, trim off any excess whitespace
             Properties.Settings.Default.VMName = txt_VMName.Text.Trim();
             Properties.Settings.Default.VMlocation = txt_VMlocation.Text.Trim();
@@ -235,6 +355,7 @@ namespace RedmineServerManager
             string time = h.ToString("00") + ":" + m.ToString("00") + " " + ap;
             Properties.Settings.Default.ArchiveTime = time;
 
+            //Switch on Archive Frequency: Monthly: 0, Weekly: 1, Daily: 2
             switch(combo_ArchiveFreq.SelectedIndex)
             {
                 case 0:
@@ -253,23 +374,101 @@ namespace RedmineServerManager
                 text += "Setting: " + setting.Name + ": " + Properties.Settings.Default[setting.Name] + "\n";
             }
 
-            System.Windows.MessageBox.Show(text);
+            System.Windows.MessageBox.Show(text, "Debug");
 
             Properties.Settings.Default.Save();
+            Saved = true;
 
             this.Close();
         }
 
+        /// <summary>
+        /// Checks that the string in txt_archiveMDays is valid.
+        /// The string should be comma separated numbers between 0-31
+        /// 
+        /// </summary>
+        /// <returns>
+        /// A two-part tuple where Item1 is a string, Item2 is an int, Item3 is a string.
+        /// Item1 will depend on the result code.
+        /// Item1 will be the formatted string if Item2 = 0,
+        /// Else, it will return the original string.
+        /// Item2 is a result code on the result of testing the field.
+        /// If the string is formatted sufficiently, Item2 = 0.
+        /// If the string isn't formatted sufficiently, Item2 = 1.
+        /// If the string contains numbers out of the range 1-31, Item2 = 2.
+        /// If the string has numbers out of range, Item3 is a comma separated string
+        /// indicating which numbers are out of range.
+        /// </returns>
+        private Tuple<string, int, string> GetMDays(string mDayString)
+        {
+            mDayString.Trim();
+            string dayString = "";
+
+            //pattern for comma separated numbers that are one or two digits in length
+            Regex rx = new Regex(@"^[\s]*\d{1,2}[\s]*([,]\s*\d{1,2})*\s*$");
+
+            Match m = rx.Match(mDayString);
+
+            if(!m.Success)
+            {
+                return new Tuple<string, int, string>(mDayString, 1, "");
+            }
+
+            //Remove whitespace
+            dayString = mDayString.Replace(" ", "");
+
+            string[] days = dayString.Split(',');
+
+            List<string> invalidDays = new List<string>();
+
+            //Check that each number is in the range 1-31
+            foreach(string day in days)
+            {
+                int d = 0;
+                try
+                {
+                    d = Convert.ToInt32(day);
+                }
+                catch(FormatException e)
+                {
+                    //Do nothing, the number will be 0;
+                }
+                if(d < 1 || d > 31)
+                {
+                    invalidDays.Add(day);
+                    //return new Tuple<string, int, string>(mDayString, 2, day);
+                }
+            }
+
+            string invalidDaysString = string.Join(", ", invalidDays.ToArray());
+            if(invalidDaysString.Length > 0)
+            {
+                return new Tuple<string, int, string>(mDayString, 2, invalidDaysString);
+            }
+
+            return new Tuple<string, int, string>(dayString, 0, "");
+        }
+
+        /// <summary>
+        /// Returns the string of comma separated boolean values (as 0,1) of days to backup
+        /// </summary>
+        /// <returns></returns>
         private string GetWDaysString()
         {
             string days = "";
 
             days += chk_Sun.IsChecked == true ? 1 : 0;
+            days += ",";
             days += chk_Mon.IsChecked == true ? 1 : 0;
+            days += ",";
             days += chk_Tue.IsChecked == true ? 1 : 0;
+            days += ",";
             days += chk_Wed.IsChecked == true ? 1 : 0;
+            days += ",";
             days += chk_Thu.IsChecked == true ? 1 : 0;
+            days += ",";
             days += chk_Fri.IsChecked == true ? 1 : 0;
+            days += ",";
             days += chk_Sat.IsChecked == true ? 1 : 0;
 
             return days;

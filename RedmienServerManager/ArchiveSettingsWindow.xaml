@@ -8,14 +8,15 @@
             <RowDefinition/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition/>
+            <ColumnDefinition Width="563*"/>
+            <ColumnDefinition Width="285*"/>
         </Grid.ColumnDefinitions>
-        <TextBox x:Name="txt_VMlocation" HorizontalAlignment="Left" Height="26" Margin="172,61,0,0" TextWrapping="Wrap" Text="Where the Virtual Machine exists" VerticalAlignment="Top" Width="551" FontSize="16"/>
+        <TextBox x:Name="txt_VMlocation" HorizontalAlignment="Left" Height="26" Margin="172,61,0,0" TextWrapping="Wrap" Text="Where the Virtual Machine exists" VerticalAlignment="Top" Width="551" FontSize="16" Grid.ColumnSpan="2"/>
         <Label Content="VM Directory" HorizontalAlignment="Left" Margin="64,56,0,0" VerticalAlignment="Top" Foreground="White" FontSize="16" Height="31" Width="103"/>
-        <Button x:Name="btn_VmDirSelect" Content="Select" HorizontalAlignment="Left" Margin="705,61,0,0" VerticalAlignment="Top" Width="75" FontSize="16" Height="26" Click="btn_VmDirSelect_click"/>
-        <TextBox x:Name="txt_archLocation" HorizontalAlignment="Left" Height="26" Margin="172,105,0,0" TextWrapping="Wrap" Text="Where to save the archives" VerticalAlignment="Top" Width="551" FontSize="16"/>
+        <Button x:Name="btn_VmDirSelect" Content="Select" HorizontalAlignment="Left" Margin="141.772,61,0,0" VerticalAlignment="Top" Width="75" FontSize="16" Height="26" Click="btn_VmDirSelect_click" Grid.Column="1"/>
+        <TextBox x:Name="txt_archLocation" HorizontalAlignment="Left" Height="26" Margin="172,105,0,0" TextWrapping="Wrap" Text="Where to save the archives" VerticalAlignment="Top" Width="551" FontSize="16" Grid.ColumnSpan="2"/>
         <Label Content="Archive Directory" HorizontalAlignment="Left" Margin="36,100,0,0" VerticalAlignment="Top" Foreground="White" FontSize="16" Height="31" Width="131"/>
-        <Button x:Name="btn_archLocation" Content="Select" HorizontalAlignment="Left" Margin="705,105,0,0" VerticalAlignment="Top" Width="75" FontSize="16" Height="26" Click="btn_archLocation_click"/>
+        <Button x:Name="btn_archLocation" Content="Select" HorizontalAlignment="Left" Margin="141.772,105,0,0" VerticalAlignment="Top" Width="75" FontSize="16" Height="26" Click="btn_archLocation_click" Grid.Column="1"/>
         <Label Content="Archive Frequency" HorizontalAlignment="Left" Margin="29,146,0,0" VerticalAlignment="Top" Foreground="White" FontSize="16" Height="31" Width="143"/>
         <ComboBox x:Name="combo_ArchiveFreq" HorizontalAlignment="Left" Margin="172,153,0,0" VerticalAlignment="Top" Width="120" SelectionChanged="combo_ArchiveFreq_changed" Height="22">
             <System:String>Monthly</System:String>
@@ -24,8 +25,7 @@
         </ComboBox>
         <TextBox x:Name="txt_VMName" HorizontalAlignment="Left" Height="26" Margin="172,22,0,0" TextWrapping="Wrap" Text="redmine" VerticalAlignment="Top" Width="278" FontSize="16"/>
         <Label Content="VM Name" HorizontalAlignment="Left" Margin="84,17,0,0" VerticalAlignment="Top" Foreground="White" FontSize="16" Height="31" Width="81"/>
-        <TextBox x:Name="txt_archiveMDays" HorizontalAlignment="Left" Height="22" Margin="328,153,0,0" TextWrapping="Wrap" Text="1,11,21" VerticalAlignment="Top" Width="409" FontSize="16" Visibility="Hidden"/>
-        <Grid x:Name="view_ArchWDays" HorizontalAlignment="Left" Height="26" Margin="305,147,0,0" VerticalAlignment="Top" Width="418" Visibility="Hidden">
+        <Grid x:Name="view_ArchWDays" HorizontalAlignment="Left" Height="26" Margin="305,147,0,0" VerticalAlignment="Top" Width="418" Visibility="Hidden" Grid.ColumnSpan="2">
             <CheckBox x:Name="chk_Mon" Content="Mon" HorizontalAlignment="Left" Margin="75,10,0,0" VerticalAlignment="Top" Height="15" Width="53" Foreground="Black" FontSize="14"/>
             <CheckBox x:Name="chk_Tue" Content="Tue" HorizontalAlignment="Left" Margin="133,10,0,0" VerticalAlignment="Top" Height="15" Width="45" Foreground="Black" FontSize="14"/>
             <CheckBox x:Name="chk_Wed" Content="Wed" HorizontalAlignment="Left" Margin="185,10,0,0" VerticalAlignment="Top" Height="15" Width="50" Foreground="Black" FontSize="14"/>
@@ -63,12 +63,16 @@
             <System:String>50</System:String>
             <System:String>55</System:String>
         </ComboBox>
-        <TextBox x:Name="txt_ArchiveTime" HorizontalAlignment="Left" Height="22" Margin="331,198,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="118" FontSize="16"/>
+        <TextBox x:Name="txt_ArchiveTime" HorizontalAlignment="Left" Height="22" Margin="331,198,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="118" FontSize="16" Focusable="False" IsReadOnly="True"/>
         <ComboBox x:Name="combo_ArchiveTime_AP" HorizontalAlignment="Left" Margin="272,198,0,0" VerticalAlignment="Top" Width="50" SelectionChanged="combo_ArchiveTimeAP_changed" Height="22" SelectedIndex="0">
             <System:String>AM</System:String>
             <System:String>PM</System:String>
         </ComboBox>
-        <Button x:Name="btn_saveSettings" Content="Save Settings" HorizontalAlignment="Left" Margin="705,273,0,0" VerticalAlignment="Top" Width="118" Height="39" Background="#FF8ED46D" FontSize="18" Click="btn_saveSettings_click"/>
+        <Button x:Name="btn_saveSettings" Content="Save Settings" HorizontalAlignment="Left" Margin="141.772,273,0,0" VerticalAlignment="Top" Width="118" Height="39" Background="#FF8ED46D" FontSize="18" Click="btn_saveSettings_click" Grid.Column="1" IsDefault="True"/>
+        <Grid x:Name="view_Mdays" HorizontalAlignment="Left" Height="45" Margin="314,137,0,0" VerticalAlignment="Top" Width="469" Grid.ColumnSpan="2" Visibility="Hidden">
+            <TextBox x:Name="txt_archiveMDays" HorizontalAlignment="Left" Height="22" Margin="56,16,0,0" TextWrapping="Wrap" Text="1,11,21" VerticalAlignment="Top" Width="409" FontSize="16"/>
+            <Label Content="days" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Foreground="White" FontSize="16" Height="31" Width="53"/>
+        </Grid>
 
     </Grid>
 </Window>
