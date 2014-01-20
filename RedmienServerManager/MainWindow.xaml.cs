@@ -17,6 +17,11 @@ using System.Text.RegularExpressions;
 using System.Xml;
 using Microsoft.WindowsAPICodePack.Dialogs;
 
+/*
+ * Remember: go away from the server controller method and use the BackgroundWorker in the MainWindow.
+ * Use a separate bgworker for each lengthy process.
+ */
+
 namespace RedmineServerManager
 {
     /// <summary>
@@ -30,14 +35,24 @@ namespace RedmineServerManager
         string def_vmDirectory = "Where the Virtual Machine Exists";
         string def_archiveDirectory = "Where to save the archives";
         ServerController controller = new ServerController();
-
+        
 
         public MainWindow()
         {
             InitializeComponent();
             //Properties.Settings.Default.Reset();
-            InitializeVMStatusIndicators();
+            Tuple<int, string> status = controller.CheckStatus();
+            logLine(status.Item2);
+            UpdateStatusIndicators(status.Item1);
             CheckSettings();
+            controller.ArchiveComplete +=controller_ArchiveComplete;
+        }
+
+        private void controller_ArchiveComplete(int status, string msg)
+        {
+            string s = msg;
+            logLine(s);
+            UpdateStatusIndicators(status);
         }
 
         /// <summary>
@@ -66,48 +81,85 @@ namespace RedmineServerManager
         }
 
         /// <summary>
-        /// Sets the VM Status indicator colors.
+        /// 
         /// </summary>
-        private void InitializeVMStatusIndicators()
+        /// <param name="status">
+        /// 0: off
+        /// 1: running
+        /// 2: archiving
+        /// 3: booting
+        /// 4: shutting down
+        /// </param>
+        private void UpdateStatusIndicators(int status)
         {
             //Create a Solid Color Brush for setting custom colors by the hex value selected from the Designer tool.
             SolidColorBrush b = new SolidColorBrush();
 
-            var vmStatus = controller.CheckIsRunning();
-            logLine(vmStatus.Item2);
+            //var vmStatus = controller.CheckStatus();
+            //logLine(vmStatus.Item2);
+            //Set Each indicator to White, except the 'off' indicator.
 
-            //if VM is running, set 'on' indicator to green and rest to white
-            //otherwise set the 'off' indicator to red and the rest to white
-            if(vmStatus.Item1)
+
+            Dispatcher.BeginInvoke(new Action(() => 
             {
-                //Set Each indicator to White, except the 'off' indicator.
+                ind_running.Fill = Brushes.White;
                 ind_off.Fill = Brushes.White;
                 ind_booting.Fill = Brushes.White;
                 ind_archiving.Fill = Brushes.White;
                 ind_shuttingDown.Fill = Brushes.White;
+            }));
+            
 
-                //Set a brush color to green hex and apply the brush to the 'on' indicator
-                b.Color = (Color)ColorConverter.ConvertFromString("#FF74AE53");
-                ind_running.Fill = b;
-
-            }
-            else
+            switch(status)
             {
-                //Set Each indicator to White, except the 'off' indicator.
-                ind_running.Fill = Brushes.White;
-                ind_booting.Fill = Brushes.White;
-                ind_archiving.Fill = Brushes.White;
-                ind_shuttingDown.Fill = Brushes.White;
-
-                //Set a brush color to the red hex value and apply the brush to the 'off' indicator
-                b.Color = (Color)ColorConverter.ConvertFromString("#FFE04141");
-                ind_off.Fill = b;
+                case 0:
+                    b.Color = (Color)ColorConverter.ConvertFromString("#FFE04141");
+                    Dispatcher.BeginInvoke(new Action(() =>
+                    {
+                        ind_off.Fill = b;
+                    }));
+                    break;
+                case 1:
+                    b.Color = (Color)ColorConverter.ConvertFromString("#FF74AE53");
+                    Dispatcher.BeginInvoke(new Action(() =>
+                        {
+                            ind_running.Fill = b;
+                        }));
+                    break;
+                case 2:
+                    b.Color = (Color)ColorConverter.ConvertFromString("#FF50C1DA");
+                    Dispatcher.BeginInvoke(new Action(() =>
+                    {
+                        ind_archiving.Fill = b;
+                    }));
+                    break;
+                case 3:
+                    b.Color = (Color)ColorConverter.ConvertFromString("#FFE0D941");
+                    Dispatcher.BeginInvoke(new Action(() =>
+                    {
+                        ind_booting.Fill = b;
+                    }));
+                    break;
+                case 4:
+                    b.Color = (Color)ColorConverter.ConvertFromString("#FFD47C62");
+                    Dispatcher.BeginInvoke(new Action(() =>
+                    {
+                        ind_shuttingDown.Fill = b;
+                    }));
+                    break;
             }
+
         }
 
+        /// <summary>
+        /// If the server is not running, returns
+        /// else stops the server, and updates the status indicators.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void btn_stopServer_click(object sender, System.Windows.RoutedEventArgs e)
         {
-            if(!controller.Running)
+            if(controller.Status != 1)
             {
                 return;
             }
@@ -115,8 +167,9 @@ namespace RedmineServerManager
 
             logLine(vmstop.Item2);
 
-            if(vmstop.Item1)
+            if(controller.Status == 0)
             {
+                UpdateStatusIndicators(0);
                 logLine(Properties.Settings.Default.VMName + " has stopped");
             }
         }
@@ -138,7 +191,10 @@ namespace RedmineServerManager
         /// <param name="text"></param>
         public void log(string text)
         {
-            txt_log.Text += text;
+            Dispatcher.BeginInvoke(new Action(() =>
+                {
+                    txt_log.Text += text;
+                }));
         }
 
         /// <summary>
@@ -150,7 +206,10 @@ namespace RedmineServerManager
         {
             if(text.Length < 1)
                 return;
-            txt_log.Text += "\n" + text;
+            Dispatcher.BeginInvoke(new Action(() => 
+                {
+                    txt_log.Text += "\n" + text;
+                }));
         }
 
         /// <summary>
@@ -160,12 +219,50 @@ namespace RedmineServerManager
         /// <param name="e"></param>
         private void btn_startServer_click(object sender, RoutedEventArgs e)
         {
-            logLine("Start button clicked");
+            logLine(controller.Status.ToString());
+            if (controller.Status != 0)
+            {
+                return;
+            }
+            var vmstart = controller.StartVM();
+
+            logLine(vmstart.Item2);
+
+            if (controller.Status == 1)
+            {
+                UpdateStatusIndicators(controller.Status);
+                logLine("'" + Properties.Settings.Default.VMName + "' has started");
+            }
         }
 
         private void btn_archiveNow_click(object sender, RoutedEventArgs e)
         {
-            logLine("Archive Now button clicked");
+            if(controller.Status == 1)
+            {
+                string txt = "The Virtual Machine is currently running.  It must be stopped to archive.\n Stop now?";
+                System.Windows.MessageBoxResult result = System.Windows.MessageBox.Show(txt, "Stop Virtual Machine?",MessageBoxButton.YesNo);
+                if(result == MessageBoxResult.Yes)
+                {
+                    btn_stopServer_click(sender, e);
+                }
+                else
+                {
+                    return;
+                }
+            }
+            if(controller.Status == 2)
+            {
+                string txt = "The Virtual Machine is currently archiving.";
+                System.Windows.MessageBox.Show(txt, "Archiving");
+                return;
+            }
+            logLine("Got Here.");
+            Tuple<int, string> arch = controller.ArchiveVM();
+
+            //controller
+            
+            logLine(arch.Item2);
+            UpdateStatusIndicators(arch.Item1);
         }
 
         private void btn_ArchiveSettings_click(object sender, RoutedEventArgs e)
