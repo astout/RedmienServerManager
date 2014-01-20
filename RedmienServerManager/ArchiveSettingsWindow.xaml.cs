@@ -26,6 +26,11 @@ namespace RedmineServerManager
 
         private bool Saved;
 
+        //FIELD DEFAULTS
+        string def_vmNAme = "redmine";
+        string def_vmDirectory = "Where the Virtual Machine Exists";
+        string def_archiveDirectory = "Where to save the archives";
+
         public ArchiveSettingsWindow()
         {
 
@@ -47,7 +52,7 @@ namespace RedmineServerManager
             //Initialize the VM location field
             if(set.VMlocation == "")
             {
-                txt_VMlocation.Text = "Where the Virtual Machine Exists";
+                txt_VMlocation.Text = def_vmDirectory; //set to defualt name
                 txt_VMlocation.Foreground = Brushes.Gray;
             }
             else
@@ -71,7 +76,7 @@ namespace RedmineServerManager
             //Initialize the Archive Location Field
             if(set.SaveLocation == "")
             {
-                txt_archLocation.Text = "Where to save the archives";
+                txt_archLocation.Text = def_archiveDirectory;
                 txt_archLocation.Foreground = Brushes.Gray;
             }
             else
@@ -113,7 +118,7 @@ namespace RedmineServerManager
 
         private void combo_ArchiveFreq_changed(object sender, SelectionChangedEventArgs e)
         {
-            Properties.Settings.Default.ArchiveFreq = combo_ArchiveFreq.SelectedIndex;
+            //Properties.Settings.Default.ArchiveFreq = combo_ArchiveFreq.SelectedIndex;
 
             var set = Properties.Settings.Default;
 
@@ -134,7 +139,7 @@ namespace RedmineServerManager
             }
 
             //If 'Weekly' Selected
-            if(combo_ArchiveFreq.SelectedIndex == 1)
+            else if(combo_ArchiveFreq.SelectedIndex == 1)
             {
                 if (set.ArchiveWDays != "")
                 {
@@ -155,6 +160,13 @@ namespace RedmineServerManager
                 view_ArchWDays.Visibility = System.Windows.Visibility.Visible;
 
             }
+
+            else
+            {
+                view_ArchWDays.Visibility = System.Windows.Visibility.Hidden;
+                view_Mdays.Visibility = System.Windows.Visibility.Hidden;
+            }
+
         }
 
         private void combo_ArchiveTimeH_changed(object sender, SelectionChangedEventArgs e)
@@ -278,27 +290,27 @@ namespace RedmineServerManager
                 txt_VMName.Focus();
                 return;
             }
-            if (txt_VMlocation.Text == "Where the Virtual Machine Exists" || txt_VMlocation.Text.Length < 1)
+            if (txt_VMlocation.Text == def_vmDirectory || txt_VMlocation.Text.Length < 1)
             {
                 System.Windows.MessageBox.Show("Please enter a valid path in the 'VM Directory' field.", "Invalid Entry");
                 txt_VMlocation.Focus();
                 return;
             }
-            if (txt_archLocation.Text == "Where to save the archives" || txt_archLocation.Text.Length < 1)
+            if (txt_archLocation.Text == def_archiveDirectory || txt_archLocation.Text.Length < 1)
             {
                 System.Windows.MessageBox.Show("Please enter a valid path in the 'Archive Directory' field.", "Invalid Entry");
                 txt_archLocation.Focus();
                 return;
             }
-            if(combo_ArchiveFreq.SelectedIndex == 0)
+            if(combo_ArchiveFreq.SelectedIndex == 0) //monthly
             {
-                var result = GetMDays(txt_archiveMDays.Text);
+                var result = GetMDays(txt_archiveMDays.Text); //returns a 3-tuple
                 string txt = "";
                 switch (result.Item2)
                 {
-                    case 0:
+                    case 0: //valid
                         break;
-                    case 1:
+                    case 1: //invalid syntax
                         txt = "Please Enter a valid list of month days separated by commas.\n";
                         txt += "(For example: 1,11,21).";
                         System.Windows.MessageBox.Show(txt, "Invalid Entry");
@@ -306,7 +318,7 @@ namespace RedmineServerManager
                         view_Mdays.Visibility = System.Windows.Visibility.Visible;
                         txt_archiveMDays.Focus();
                         return;
-                    case 2:
+                    case 2: //invalid, numbers out of range
                         txt = "The following numbers are out of range for a month:\n";
                         txt += result.Item3 + "\n";
                         txt += "The numbers should be comma separated and in the range 1-31.\n";
@@ -318,7 +330,7 @@ namespace RedmineServerManager
                         return;
                 }
             }
-            if(combo_ArchiveFreq.SelectedIndex == 1)
+            if(combo_ArchiveFreq.SelectedIndex == 1) //weekly
             {
                 int sum = 0;
                 sum += chk_Sun.IsChecked == true ? 1 : 0;

@@ -73,7 +73,7 @@ namespace RedmineServerManager.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        [global::System.Configuration.DefaultSettingValueAttribute("-1")]
         public int ArchiveFreq {
             get {
                 return ((int)(this["ArchiveFreq"]));
@@ -97,7 +97,7 @@ namespace RedmineServerManager.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0,1,1,0,0,0,1")]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
         public string ArchiveWDays {
             get {
                 return ((string)(this["ArchiveWDays"]));
